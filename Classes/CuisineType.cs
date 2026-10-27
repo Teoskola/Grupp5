@@ -4,6 +4,7 @@ namespace Grupp5;
 
 public enum CuisineType
 {
+    None                   // Ingen specifik typ av mat
     SwedishScandinavian,   // Svenskt & Skandinaviskt
     European,              // Europeiskt
     Asian,                 // Asiatiskt
@@ -11,6 +12,5 @@ public enum CuisineType
     AmericanGrill,         // Amerikanskt & Grill
     International,         // Internationellt
     BarsCafesOther,        // Barer, caféer och övrigt
-    None                   // Ingen specifik typ av mat
 }
 
