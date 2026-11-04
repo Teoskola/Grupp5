@@ -19,6 +19,20 @@ public class RestaurantService
         return store;
     }
     // Search(text): List<Restaurant> - LINQ Where: namn/adress innehåller text
+    // Search(text): List<Restaurant> - LINQ Where: namn/adress/område innehåller text
+    public List<Restaurant> Search(string text)
+    {
+        // Tom söktext ger ingen träff (annars matchar allt, eller så kraschar Contains)
+        if (string.IsNullOrWhiteSpace(text))
+            return new List<Restaurant>();
+        // LINQ Where: namn/adress/område innehåller text
+        return store
+            .Where(restaurant =>
+                (restaurant.Name?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (restaurant.Address?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (restaurant.District?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false))
+            .ToList();
+    }
     // FilterByCuisine(c): List<Restaurant> - LINQ Where: bara valt kök
     public List<Restaurant> FilterByCuisine(CuisineType cuisine)
         {
