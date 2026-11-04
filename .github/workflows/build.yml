@@ -1,0 +1,39 @@
+name: Build
+
+# Körs när någon skapar eller uppdaterar en pull request mot main
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Hämta koden från PR:n
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Installera .NET (ändra versionen om ert projekt använder en annan)
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # 3. Hitta lösningsfilen (.sln) oavsett vilken mapp den ligger i
+      - name: Find solution
+        id: sln
+        run: |
+          SLN=$(find . -name "*.sln" | head -n 1)
+          if [ -z "$SLN" ]; then
+            echo "Ingen .sln-fil hittades" && exit 1
+          fi
+          echo "path=$SLN" >> "$GITHUB_OUTPUT"
+
+      # 4. Hämta NuGet-paket (t.ex. Spectre.Console)
+      - name: Restore
+        run: dotnet restore "${{ steps.sln.outputs.path }}"
+
+      # 5. Bygg projektet. Om bygget misslyckas blir kontrollen röd.
+      - name: Build
+        run: dotnet build "${{ steps.sln.outputs.path }}" --configuration Release --no-restore
