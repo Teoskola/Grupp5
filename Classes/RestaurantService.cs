@@ -35,10 +35,14 @@ public class RestaurantService
     }
     // FilterByCuisine(c): List<Restaurant> - LINQ Where: bara valt kök
     public List<Restaurant> FilterByCuisine(CuisineType cuisine)
-        {
-            return store.Where(restaurant => restaurant.Cuisinetype == cuisine).ToList();
-        }
+    {
+        return store.Where(restaurant => restaurant.Cuisinetype == cuisine).ToList();
+    }
     // SortByRating(): List<Restaurant> - LINQ OrderByDescending: högst betyg först
+    public List<Restaurant> SortByRating()
+    {
+        return store.OrderByDescending(restaurant => restaurant.Rating).ToList();
+    }
     // Load(): void - laddar JSON vid programstart, loggar
     // Save(): void - sparar JSON vid programavslut, loggar
 }
