@@ -20,6 +20,10 @@ public class RestaurantService
     }
     // Search(text): List<Restaurant> - LINQ Where: namn/adress innehåller text
     // FilterByCuisine(c): List<Restaurant> - LINQ Where: bara valt kök
+    public List<Restaurant> FilterByCuisine(CuisineType cuisine)
+        {
+            return store.Where(restaurant => restaurant.Cuisinetype == cuisine).ToList();
+        }
     // SortByRating(): List<Restaurant> - LINQ OrderByDescending: högst betyg först
     // Load(): void - laddar JSON vid programstart, loggar
     // Save(): void - sparar JSON vid programavslut, loggar
