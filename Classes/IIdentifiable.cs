@@ -1,4 +1,4 @@
-namespace grupp5;
+namespace Grupp5;
 
 /// <summary>
 /// Ett kontrakt (interface): "Allt som sparas i DataStore måste ha ett unikt Id."
