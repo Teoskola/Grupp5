@@ -13,6 +13,10 @@ public class RestaurantService
     // Add(r): void - lägg till (get nytt Id) och loggar
     // Update(r): bool - ersätt befintlig restaurang, false om Id saknas
     // Delete(id): bool - ta bort restaurang med Id, false om Id saknas
+    public bool Delete(int id)
+    {
+        return store.RemoveAll(r => r.Id == id) > 0;
+    }
     // GetAll(): List<Restaurant> - alla restauranger
     public List<Restaurant> GetAll()
     {
