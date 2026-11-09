@@ -31,6 +31,7 @@ public class RestaurantService
     {
         // Hitta index för restaurangen med samma Id
         int index = store.FindIndex(restaurant => restaurant.Id == updatedRestaurant.Id);
+        // Metoden FindIndex returnerar -1 om ingen matchning hittas
         if (index == -1)
             return false; // Restaurangen med detta Id finns inte
 
