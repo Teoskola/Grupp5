@@ -27,6 +27,18 @@ public class RestaurantService
         store.Add(restaurant);
     }
     // Update(r): bool - ersätt befintlig restaurang, false om Id saknas
+    public bool Update(Restaurant updatedRestaurant)
+    {
+        // Hitta index för restaurangen med samma Id
+        int index = store.FindIndex(restaurant => restaurant.Id == updatedRestaurant.Id);
+        // Metoden FindIndex returnerar -1 om ingen matchning hittas
+        if (index == -1)
+            return false; // Restaurangen med detta Id finns inte
+
+        // Ersätt den befintliga restaurangen med den nya
+        store[index] = updatedRestaurant;
+        return true;
+    }
     // Delete(id): bool - ta bort restaurang med Id, false om Id saknas
     public bool Delete(int id)
     {
