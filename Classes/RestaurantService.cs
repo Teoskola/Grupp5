@@ -11,6 +11,21 @@ public class RestaurantService
 
     //METODER
     // Add(r): void - lägg till (get nytt Id) och loggar
+    // Add(r): void - lägg till (ger nytt Id) och loggar
+    public void Add(Restaurant restaurant)
+    {
+        // Validering: ogiltiga restauranger ska inte sparas
+        if (string.IsNullOrWhiteSpace(restaurant.Name))
+            throw new ArgumentException("Namnet får inte vara tomt.");
+
+        if (restaurant.Rating < 1 || restaurant.Rating > 5)
+            throw new ArgumentException("Betyget måste vara mellan 1 och 5.");
+
+        // Nytt Id = högsta befintliga + 1 (börjar på 1 om listan är tom)
+        restaurant.Id = store.Count == 0 ? 1 : store.Max(r => r.Id) + 1;
+        // Lägg till restaurangen i listan
+        store.Add(restaurant);
+    }
     // Update(r): bool - ersätt befintlig restaurang, false om Id saknas
     // Delete(id): bool - ta bort restaurang med Id, false om Id saknas
     public bool Delete(int id)
