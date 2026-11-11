@@ -93,7 +93,35 @@ public class MainMenu
     // Tips: hämta listan med restaurants.GetAll() och skriv ut en rad per restaurang.
     private void ShowAllRestaurants()
     {
-        AnsiConsole.MarkupLine("[grey]Inte klar än.[/]");
+        var list = restaurants.GetAll();
+
+        if (list.Count == 0)
+            {
+                AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
+                return;
+            }
+        
+        var table = new Table();
+            table.AddColumn("Id");
+            table.AddColumn("Namn");
+            table.AddColumn("Kök");
+            table.AddColumn("Område");
+            table.AddColumn("Adress");
+            table.AddColumn("Betyg");
+        
+        foreach (var restaurant in list)
+            {
+                table.AddRow(
+                    restaurant.Id.ToString(),
+                    restaurant.Name ?? "",
+                    restaurant.Cuisinetype.ToString(),
+                    restaurant.District ?? "",
+                    restaurant.Address ?? "",
+                    restaurant.Rating.ToString("0.0")
+                );
+            }
+        
+        AnsiConsole.Write(table);
     }
 
     // AddRestaurant(): void - frågar efter data, validerar, skapar Restaurant
@@ -101,8 +129,52 @@ public class MainMenu
     // skapa en Restaurant och anropa restaurants.Add(...) i en try/catch.
     private void AddRestaurant()
     {
-        AnsiConsole.MarkupLine("[grey]Inte klar än.[/]");
+        string name = AnsiConsole.Ask<string>("Namn på restaurangen: ");
+
+        string district = AnsiConsole.Ask<string>("Område: ");
+
+        string adress = AnsiConsole.Ask<string>("Adress: ");
+        
+        double rating = AnsiConsole.Prompt(
+            new TextPrompt<double>("Betyg (1-5): ")
+                .Validate(ratingInput => ratingInput >= 1 && ratingInput <= 5
+                    ? ValidationResult.Success()
+                    : ValidationResult.Error("[red]Betyget måste vara mellan 1 och 5[/]")));
+
+        PriceLevel priceLevel = AnsiConsole.Prompt(
+            new SelectionPrompt<PriceLevel>()
+                .Title("[green]Hur dyrt är det?[/]")
+                .AddChoices(Enum.GetValues<PriceLevel>()));
+
+        CuisineType cuisineType = AnsiConsole.Prompt(
+            new SelectionPrompt<CuisineType>()
+                .Title("[green]Vilket kök serveras?[/]")
+                .AddChoices(Enum.GetValues<CuisineType>()));    
+
+        bool isVegetarian = AnsiConsole.Confirm("Finns vegetariska alternativ?");
+
+        var restaurant = new Restaurant
+            {
+                Name = name,
+                District = district,
+                Address = adress,
+                Rating = rating,
+                PriceLevel = priceLevel,
+                Cuisinetype = cuisineType,
+                IsVegetarianFriendly = isVegetarian
+            };
+
+        try
+            {
+                restaurants.Add(restaurant);
+                AnsiConsole.MarkupLine("[green]Restaurangen har lagts till.[/]");
+            }
+            catch (ArgumentException ex)
+            {
+                AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
+            }
     }
+
 
     // EditRestaurant(): void - väljer restaurang och ändrar fält
     // Tips: fråga efter Id, hitta restaurangen, fråga efter nya värden
