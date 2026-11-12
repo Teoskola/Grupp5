@@ -188,7 +188,46 @@ public class MainMenu
     // Tips: fråga efter Id, be om bekräftelse och anropa restaurants.Delete(id).
     private void DeleteRestaurant()
     {
-        AnsiConsole.MarkupLine("[grey]Inte klar än.[/]");
+        var list = restaurants.GetAll();
+        
+        // Om listan är tom finns det ingen restaurang att uppdatera
+        if (list.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
+            return;
+        }
+
+        //Fråga användaren efter söktext för att hitta restaurangen som ska uppdateras
+        string text = AnsiConsole.Ask<string>("Vilken restaurang vill du ta bort? Sök: ");
+        
+        var matches = restaurants.Search(text);
+
+        // Om inga matchningar hittas, visa ett meddelande och returnera
+        if (matches.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[yellow]Inga restauranger hittades.[/]");
+            return;
+        }
+
+        // Låt användaren välja en restaurang från matchningarna
+        var selected = AnsiConsole.Prompt(
+            new SelectionPrompt<Restaurant>()
+                .Title("[green]Välj restaurang att ta bort:[/]")
+                .UseConverter(r => $"{r.Name} - {r.Address}")
+                .AddChoices(matches));
+
+        // Bekräfta borttagning
+        bool confirm = AnsiConsole.Confirm($"Är du säker på att du vill ta bort {selected.Name}?");
+
+        if (confirm)
+        {
+            restaurants.Delete(selected.Id);
+            AnsiConsole.MarkupLine("[green]Restaurang borttagen.[/]");
+        }
+        else
+        {
+            AnsiConsole.MarkupLine("[yellow]Borttagning avbruten.[/]");
+        }
     }
 
     // SearchRestaurants(): void - frågar efter söktext och visar resultat
