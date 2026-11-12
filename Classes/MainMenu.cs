@@ -100,28 +100,12 @@ public class MainMenu
                 AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
                 return;
             }
-        
-        var table = new Table();
-            table.AddColumn("Id");
-            table.AddColumn("Namn");
-            table.AddColumn("Kök");
-            table.AddColumn("Område");
-            table.AddColumn("Adress");
-            table.AddColumn("Betyg");
-        
-        foreach (var restaurant in list)
-            {
-                table.AddRow(
-                    restaurant.Id.ToString(),
-                    restaurant.Name ?? "",
-                    restaurant.Cuisinetype.ToString(),
-                    restaurant.District ?? "",
-                    restaurant.Address ?? "",
-                    restaurant.Rating.ToString("0.0")
-                );
-            }
-        
-        AnsiConsole.Write(table);
+             //Skriver ut en tabell med alla resturanger
+            TableRenderer.ShowRestaurantTable(list);
+
+
+
+
     }
 
     // AddRestaurant(): void - frågar efter data, validerar, skapar Restaurant
@@ -313,6 +297,27 @@ public class MainMenu
     // Tips: fråga efter text, anropa restaurants.Search(text) och skriv ut träffarna.
     private void SearchRestaurants()
     {
-        AnsiConsole.MarkupLine("[grey]Inte klar än.[/]");
+        // SearchRestaurants(): void - frågar efter söktext och visar resultat
+        // Om listan är tom finns det inget att söka i
+        if (restaurants.GetAll().Count == 0)
+        {
+            AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
+            return;
+        }
+
+        string text = AnsiConsole.Ask<string>("Sök (namn, adress eller område): ");
+
+        // Själva sökningen görs i servicen (LINQ), menyn visar bara resultatet
+        var results = restaurants.Search(text);
+
+        if (results.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"[yellow]Inga restauranger hittades för '{Markup.Escape(text)}'.[/]");
+            return;
+        }
+
+        AnsiConsole.MarkupLine($"[green]{results.Count} träff(ar) för '{Markup.Escape(text)}':[/]");
+        TableRenderer.ShowRestaurantTable(results);
     }
+
 }
