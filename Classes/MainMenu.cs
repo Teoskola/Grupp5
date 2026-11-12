@@ -181,7 +181,86 @@ public class MainMenu
     // och anropa restaurants.Update(...).
     private void EditRestaurant()
     {
-        AnsiConsole.MarkupLine("[grey]Inte klar än.[/]");
+        var list = restaurants.GetAll();
+        
+        // Om listan är tom finns det ingen restaurang att uppdatera
+        if (list.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
+            return;
+        }
+
+        //Fråga användaren efter söktext för att hitta restaurangen som ska uppdateras
+        string text = AnsiConsole.Ask<string>("Vilken restaurang vill du uppdatera? Sök: ");
+        
+        var matches = restaurants.Search(text);
+
+        // Om inga matchningar hittas, visa ett meddelande och returnera
+        if (matches.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[yellow]Inga restauranger hittades.[/]");
+            return;
+        }
+
+        // Låt användaren välja en restaurang från matchningarna
+        var selected = AnsiConsole.Prompt(
+            new SelectionPrompt<Restaurant>()
+                .Title("[green]Vilken restaurang vill du ändra?[/]")
+                .UseConverter(r => $"{r.Name} - {r.Address}")
+                .AddChoices(matches));
+
+        // Fråga användaren vilket fält som ska uppdateras
+        string choice = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Vad vill du uppdatera?")
+                .AddChoices("Namn", "Område", "Adress", "Betyg", "Prisnivå", "Kök", "Vegetariskt"));
+
+        switch (choice)
+        {
+            case "Namn":
+                string newName = AnsiConsole.Ask<string>("Nytt namn: ");
+                selected.Name = newName;
+                break;
+            case "Område":
+                string newDistrict = AnsiConsole.Ask<string>("Nytt område: ");
+                selected.District = newDistrict;
+                break;
+            case "Adress":
+                string newAddress = AnsiConsole.Ask<string>("Ny adress: ");
+                selected.Address = newAddress;
+                break;
+            case "Betyg":
+                double newRating = AnsiConsole.Prompt(
+                    new TextPrompt<double>("Nytt betyg (1-5): ")
+                        .Validate(ratingInput => ratingInput >= 1 && ratingInput <= 5
+                            ? ValidationResult.Success()
+                            : ValidationResult.Error("[red]Betyget måste vara mellan 1 och 5[/]")));
+                selected.Rating = newRating;
+                break;
+            case "Prisnivå":
+                PriceLevel newPriceLevel = AnsiConsole.Prompt(
+                    new SelectionPrompt<PriceLevel>()
+                        .Title("[green]Hur dyrt är det?[/]")
+                        .AddChoices(Enum.GetValues<PriceLevel>()));
+                    selected.PriceLevel = newPriceLevel;
+                break;
+            case "Kök":
+                CuisineType newCuisineType = AnsiConsole.Prompt(
+                    new SelectionPrompt<CuisineType>()
+                        .Title("[green]Vilket kök serveras?[/]")
+                        .AddChoices(Enum.GetValues<CuisineType>()));
+                    selected.Cuisinetype = newCuisineType;
+                break;
+            case "Vegetariskt":
+                bool newIsVegetarian = AnsiConsole.Confirm("Finns vegetariska alternativ?");
+                selected.IsVegetarianFriendly = newIsVegetarian;
+                break;
+        }
+
+        if (restaurants.Update(selected))
+            AnsiConsole.MarkupLine("[green]Restaurang uppdaterad.[/]");
+        else
+            AnsiConsole.MarkupLine("[red]Misslyckades att uppdatera restaurang.[/]");
     }
 
     // DeleteRestaurant(): void - tar bort restaurang efter bekräftelse
