@@ -8,6 +8,7 @@ public class RestaurantService
     // Jag gör en tillfällig lista här för att kunna testa utan JSON, men den ska ersättas med Datastore<Restaurant> senare
     private List<Restaurant> store = new List<Restaurant>();
     // log: LogService - för att logga händelser och fel
+    private LogService log = new LogService();
 
     //METODER
     // Add(r): void - lägg till (get nytt Id) och loggar
@@ -25,6 +26,7 @@ public class RestaurantService
         restaurant.Id = store.Count == 0 ? 1 : store.Max(r => r.Id) + 1;
         // Lägg till restaurangen i listan
         store.Add(restaurant);
+        log.LogEvent($"{restaurant.Name} - {restaurant.Address} har lagts till");
     }
     // Update(r): bool - ersätt befintlig restaurang, false om Id saknas
     public bool Update(Restaurant updatedRestaurant)
@@ -33,16 +35,31 @@ public class RestaurantService
         int index = store.FindIndex(restaurant => restaurant.Id == updatedRestaurant.Id);
         // Metoden FindIndex returnerar -1 om ingen matchning hittas
         if (index == -1)
+        {
+            log.LogEvent($"Försökte uppdatera Id {updatedRestaurant.Id}, men ingen hittades");
             return false; // Restaurangen med detta Id finns inte
+        }
 
         // Ersätt den befintliga restaurangen med den nya
         store[index] = updatedRestaurant;
+        log.LogEvent($"{updatedRestaurant.Name} har uppdaterats");
         return true;
     }
     // Delete(id): bool - ta bort restaurang med Id, false om Id saknas
     public bool Delete(int id)
     {
-        return store.RemoveAll(r => r.Id == id) > 0;
+        int removed = store.RemoveAll(restaurant => restaurant.Id == id);
+
+        if (removed > 0)
+        {
+            log.LogEvent($"Restaurang med Id {id} har tagits bort");
+        }
+        else
+        {
+            log.LogEvent($"Försökte ta bort Id {id}, men ingen hittades");
+        }
+
+        return removed > 0;
     }
     // GetAll(): List<Restaurant> - alla restauranger
     public List<Restaurant> GetAll()
