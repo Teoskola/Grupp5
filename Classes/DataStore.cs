@@ -4,7 +4,9 @@ public class DataStore<T> where T : IIdentifiable
 {
     //ATTRIBUTER
     // items: List<T> - alla objekt i minnet
+    private List<T> items = new List<T>();
     // filePath: string - sökväg till JSON-filen
+    private string filePath = "restaurants.json";
 
     //METODER
     // AddItem(item): void - lägger till ett objekt i listan
