@@ -90,4 +90,9 @@ public class RestaurantService
     // }
     // Load(): void - laddar JSON vid programstart, loggar
     // Save(): void - sparar JSON vid programavslut, loggar
+    public void Save()
+    {
+        store.SaveToJson();
+        log.LogEvent("Data har sparats till JSON");
+    }
 }
