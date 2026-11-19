@@ -16,7 +16,16 @@ public class DataStore<T> where T : IIdentifiable
     }
 
     // RemoveItem(id): bool - tar bort objekt med givet Id
+    public bool RemoveItem(int id)
+    {
+        return items.RemoveAll(item => item.Id == id) > 0;
+    }
+
     // FindItem(id): T? - hittar objekt med givet Id, null om ej funnet
+    public T? FindItem(int id)
+    {
+        return items.FirstOrDefault(item => item.Id == id);
+    }
     // GetAll(): ReadOnlyList<T> - returnerar alla (skrivskyddad)
     public IReadOnlyList<T> GetAll()
     {

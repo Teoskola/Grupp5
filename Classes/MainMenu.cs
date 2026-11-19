@@ -164,7 +164,7 @@ public class MainMenu
         var list = restaurants.GetAll();
         
         // Om listan är tom finns det ingen restaurang att uppdatera
-        if (list.GetAll().Count == 0)
+        if (list.Count == 0)
         {
             AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
             return;
