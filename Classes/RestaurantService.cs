@@ -10,7 +10,6 @@ public class RestaurantService
     private LogService log = new LogService();
 
     //METODER
-    // Add(r): void - lägg till (get nytt Id) och loggar
     // Add(r): void - lägg till (ger nytt Id) och loggar
     public void Add(Restaurant restaurant)
     {
@@ -29,58 +28,56 @@ public class RestaurantService
         log.LogEvent($"{restaurant.Name} - {restaurant.Address} har lagts till");
     }
     // Update(r): bool - ersätt befintlig restaurang, false om Id saknas
-    // public bool Update(Restaurant updatedRestaurant)
-    // {
-    //     // Hitta index för restaurangen med samma Id
-    //     int index = store.FindIndex(restaurant => restaurant.Id == updatedRestaurant.Id);
-    //     // Metoden FindIndex returnerar -1 om ingen matchning hittas
-    //     if (index == -1)
-    //     {
-    //         log.LogEvent($"Försökte uppdatera Id {updatedRestaurant.Id}, men ingen hittades");
-    //         return false; // Restaurangen med detta Id finns inte
-    //     }
-
-    //     // Ersätt den befintliga restaurangen med den nya
-    //     store[index] = updatedRestaurant;
-    //     log.LogEvent($"{updatedRestaurant.Name} har uppdaterats");
-    //     return true;
-    // }
-    // Delete(id): bool - ta bort restaurang med Id, false om Id saknas
-    // public bool Delete(int id)
-    // {
-    //     int removed = store.RemoveAll(restaurant => restaurant.Id == id);
-
-    //     if (removed > 0)
-    //     {
-    //         log.LogEvent($"Restaurang med Id {id} har tagits bort");
-    //     }
-    //     else
-    //     {
-    //         log.LogEvent($"Försökte ta bort Id {id}, men ingen hittades");
-    //     }
-
-    //     return removed > 0;
-    // }
-    // GetAll(): List<Restaurant> - alla restauranger
-    public DataStore<Restaurant> GetAll()
+    public bool Update(Restaurant updatedRestaurant)
     {
-        return store;
+        var existing = store.FindItem(updatedRestaurant.Id);
+
+        if (existing == null)
+        {
+            log.LogEvent($"Försökte uppdatera Id {updatedRestaurant.Id}, men ingen hittades");
+            return false;
+        }
+
+        log.LogEvent($"{updatedRestaurant.Name} har uppdaterats");
+        return true;
     }
+
+    // Delete(id): bool - ta bort restaurang med Id, false om Id saknas
+    public bool Delete(int id)
+    {
+        bool removed = store.RemoveItem(id);
+
+        if (removed)
+        {
+            log.LogEvent($"Restaurang med Id {id} har tagits bort");
+        }
+        else
+        {
+            log.LogEvent($"Försökte ta bort Id {id}, men ingen hittades");
+        }
+        return removed;
+    }
+    // GetAll(): List<Restaurant> - alla restauranger
+    public List<Restaurant> GetAll()
+    {
+        return store.GetAll().ToList();
+    }
+    
     // Search(text): List<Restaurant> - LINQ Where: namn/adress innehåller text
     // Search(text): List<Restaurant> - LINQ Where: namn/adress/område innehåller text
-    // public DataStore<Restaurant> Search(string text)
-    // {
-    //     // Tom söktext ger ingen träff (annars matchar allt, eller så kraschar Contains)
-    //     if (string.IsNullOrWhiteSpace(text))
-    //         return new DataStore<Restaurant>();
-    //     // LINQ Where: namn/adress/område innehåller text
-    //     return store
-    //         .Where(restaurant =>
-    //             (restaurant.Name?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
-    //             (restaurant.Address?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
-    //             (restaurant.District?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false))
-    //         .ToList();
-    // }
+    public List<Restaurant> Search(string text)
+    {
+        // Tom söktext ger ingen träff (annars matchar allt, eller så kraschar Contains)
+        if (string.IsNullOrWhiteSpace(text))
+            return new List<Restaurant>();
+        // LINQ Where: namn/adress/område innehåller text
+        return store.GetAll()
+            .Where(restaurant =>
+                (restaurant.Name?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (restaurant.Address?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (restaurant.District?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false))
+            .ToList();
+    }
     // FilterByCuisine(c): List<Restaurant> - LINQ Where: bara valt kök
     // public DataStore<Restaurant> FilterByCuisine(CuisineType cuisine)
     // {

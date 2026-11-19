@@ -1,0 +1,17 @@
+[
+  {
+    "Timestamp": "2026-11-19T12:24:08.7901485+01:00",
+    "Level": "Info",
+    "Message": "test - test har lagts till"
+  },
+  {
+    "Timestamp": "2026-11-19T12:24:19.0485091+01:00",
+    "Level": "Info",
+    "Message": "test har uppdaterats"
+  },
+  {
+    "Timestamp": "2026-11-19T12:24:41.0028203+01:00",
+    "Level": "Info",
+    "Message": "Restaurang med Id 1 har tagits bort"
+  }
+]
