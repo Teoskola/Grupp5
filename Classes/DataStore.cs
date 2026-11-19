@@ -1,4 +1,5 @@
 namespace Grupp5;
+using System.Text.Json;
 
 public class DataStore<T> where T : IIdentifiable
 {
@@ -34,4 +35,20 @@ public class DataStore<T> where T : IIdentifiable
 
     // SaveToJson(): void - Json.Serializer.Serialize till fil (try/catch)
     // LoadFromJson(): void - läser fil, Deserialize; tom lista om filen saknas
+    public void loadFromJson()
+    {
+        try
+        {
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                items = JsonSerializer.Deserialize<List<T>>(json) ?? new List<T>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fel vid inläsning av JSON: {ex.Message}");
+            items = new List<T>();
+        }
+    }
 }
