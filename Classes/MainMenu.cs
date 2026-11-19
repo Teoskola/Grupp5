@@ -102,11 +102,7 @@ public class MainMenu
             }
              //Skriver ut en tabell med alla resturanger
             TableRenderer.ShowRestaurantTable(list);
-
-
-
-
-    }
+        }
 
     // AddRestaurant(): void - frågar efter data, validerar, skapar Restaurant
     // Tips: fråga efter namn, adress, område, kök, prisnivå, betyg och vegetariskt,
@@ -168,7 +164,7 @@ public class MainMenu
         var list = restaurants.GetAll();
         
         // Om listan är tom finns det ingen restaurang att uppdatera
-        if (list.Count == 0)
+        if (list.GetAll().Count == 0)
         {
             AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
             return;
