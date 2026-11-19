@@ -10,9 +10,19 @@ public class DataStore<T> where T : IIdentifiable
 
     //METODER
     // AddItem(item): void - lägger till ett objekt i listan
+    public void AddItem(T item)
+    {      
+      items.Add(item);
+    }
+
     // RemoveItem(id): bool - tar bort objekt med givet Id
     // FindItem(id): T? - hittar objekt med givet Id, null om ej funnet
     // GetAll(): ReadOnlyList<T> - returnerar alla (skrivskyddad)
+    public IReadOnlyList<T> GetAll()
+    {
+        return items;
+    }
+
     // SaveToJson(): void - Json.Serializer.Serialize till fil (try/catch)
     // LoadFromJson(): void - läser fil, Deserialize; tom lista om filen saknas
 }

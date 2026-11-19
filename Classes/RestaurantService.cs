@@ -5,8 +5,7 @@ public class RestaurantService
 {
     //ATTRIBUTER
     // Datastore<Restaurant> - listan + JSON-hanteringen
-    // Jag gör en tillfällig lista här för att kunna testa utan JSON, men den ska ersättas med Datastore<Restaurant> senare
-    private List<Restaurant> store = new List<Restaurant>();
+    private DataStore<Restaurant> store = new DataStore<Restaurant>();
     // log: LogService - för att logga händelser och fel
     private LogService log = new LogService();
 
@@ -21,76 +20,77 @@ public class RestaurantService
 
         if (restaurant.Rating < 1 || restaurant.Rating > 5)
             throw new ArgumentException("Betyget måste vara mellan 1 och 5.");
-
+        
         // Nytt Id = högsta befintliga + 1 (börjar på 1 om listan är tom)
-        restaurant.Id = store.Count == 0 ? 1 : store.Max(r => r.Id) + 1;
+        restaurant.Id = store.GetAll().Count == 0 ? 1 : store.GetAll().Max(r => r.Id) + 1;
+
         // Lägg till restaurangen i listan
-        store.Add(restaurant);
+        store.AddItem(restaurant);
         log.LogEvent($"{restaurant.Name} - {restaurant.Address} har lagts till");
     }
     // Update(r): bool - ersätt befintlig restaurang, false om Id saknas
-    public bool Update(Restaurant updatedRestaurant)
-    {
-        // Hitta index för restaurangen med samma Id
-        int index = store.FindIndex(restaurant => restaurant.Id == updatedRestaurant.Id);
-        // Metoden FindIndex returnerar -1 om ingen matchning hittas
-        if (index == -1)
-        {
-            log.LogEvent($"Försökte uppdatera Id {updatedRestaurant.Id}, men ingen hittades");
-            return false; // Restaurangen med detta Id finns inte
-        }
+    // public bool Update(Restaurant updatedRestaurant)
+    // {
+    //     // Hitta index för restaurangen med samma Id
+    //     int index = store.FindIndex(restaurant => restaurant.Id == updatedRestaurant.Id);
+    //     // Metoden FindIndex returnerar -1 om ingen matchning hittas
+    //     if (index == -1)
+    //     {
+    //         log.LogEvent($"Försökte uppdatera Id {updatedRestaurant.Id}, men ingen hittades");
+    //         return false; // Restaurangen med detta Id finns inte
+    //     }
 
-        // Ersätt den befintliga restaurangen med den nya
-        store[index] = updatedRestaurant;
-        log.LogEvent($"{updatedRestaurant.Name} har uppdaterats");
-        return true;
-    }
+    //     // Ersätt den befintliga restaurangen med den nya
+    //     store[index] = updatedRestaurant;
+    //     log.LogEvent($"{updatedRestaurant.Name} har uppdaterats");
+    //     return true;
+    // }
     // Delete(id): bool - ta bort restaurang med Id, false om Id saknas
-    public bool Delete(int id)
-    {
-        int removed = store.RemoveAll(restaurant => restaurant.Id == id);
+    // public bool Delete(int id)
+    // {
+    //     int removed = store.RemoveAll(restaurant => restaurant.Id == id);
 
-        if (removed > 0)
-        {
-            log.LogEvent($"Restaurang med Id {id} har tagits bort");
-        }
-        else
-        {
-            log.LogEvent($"Försökte ta bort Id {id}, men ingen hittades");
-        }
+    //     if (removed > 0)
+    //     {
+    //         log.LogEvent($"Restaurang med Id {id} har tagits bort");
+    //     }
+    //     else
+    //     {
+    //         log.LogEvent($"Försökte ta bort Id {id}, men ingen hittades");
+    //     }
 
-        return removed > 0;
-    }
+    //     return removed > 0;
+    // }
     // GetAll(): List<Restaurant> - alla restauranger
-    public List<Restaurant> GetAll()
+    public DataStore<Restaurant> GetAll()
     {
         return store;
     }
     // Search(text): List<Restaurant> - LINQ Where: namn/adress innehåller text
     // Search(text): List<Restaurant> - LINQ Where: namn/adress/område innehåller text
-    public List<Restaurant> Search(string text)
-    {
-        // Tom söktext ger ingen träff (annars matchar allt, eller så kraschar Contains)
-        if (string.IsNullOrWhiteSpace(text))
-            return new List<Restaurant>();
-        // LINQ Where: namn/adress/område innehåller text
-        return store
-            .Where(restaurant =>
-                (restaurant.Name?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (restaurant.Address?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (restaurant.District?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false))
-            .ToList();
-    }
+    // public DataStore<Restaurant> Search(string text)
+    // {
+    //     // Tom söktext ger ingen träff (annars matchar allt, eller så kraschar Contains)
+    //     if (string.IsNullOrWhiteSpace(text))
+    //         return new DataStore<Restaurant>();
+    //     // LINQ Where: namn/adress/område innehåller text
+    //     return store
+    //         .Where(restaurant =>
+    //             (restaurant.Name?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+    //             (restaurant.Address?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+    //             (restaurant.District?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false))
+    //         .ToList();
+    // }
     // FilterByCuisine(c): List<Restaurant> - LINQ Where: bara valt kök
-    public List<Restaurant> FilterByCuisine(CuisineType cuisine)
-    {
-        return store.Where(restaurant => restaurant.Cuisinetype == cuisine).ToList();
-    }
-    // SortByRating(): List<Restaurant> - LINQ OrderByDescending: högst betyg först
-    public List<Restaurant> SortByRating()
-    {
-        return store.OrderByDescending(restaurant => restaurant.Rating).ToList();
-    }
+    // public DataStore<Restaurant> FilterByCuisine(CuisineType cuisine)
+    // {
+    //     return store.Where(restaurant => restaurant.Cuisinetype == cuisine).ToList();
+    // }
+    // // SortByRating(): List<Restaurant> - LINQ OrderByDescending: högst betyg först
+    // public DataStore<Restaurant> SortByRating()
+    // {
+    //     return store.OrderByDescending(restaurant => restaurant.Rating).ToList();
+    // }
     // Load(): void - laddar JSON vid programstart, loggar
     // Save(): void - sparar JSON vid programavslut, loggar
 }
