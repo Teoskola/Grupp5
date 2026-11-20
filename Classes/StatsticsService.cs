@@ -30,5 +30,13 @@ public class StatisticsService
 
         return list.Average(avg => avg.Rating);
     }
+
     // GetTopRated(n): List<Restaurant> - topplista: den högst betygsatta
+    public List<Restaurant> GetTopRated(int number)
+    {
+        return restaurants.GetAll()
+            .OrderByDescending(restaurant => restaurant.Rating)
+            .Take(number)
+            .ToList();
+    }
 }
