@@ -12,6 +12,6 @@ class Program
         mainMenu.Run();
 
         // Spara restauranger till JSON-fil innan programmet avslutas
-        //restaurantService.SaveToJson();
+        restaurantService.Save();
     }
 }
