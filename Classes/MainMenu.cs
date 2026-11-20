@@ -97,7 +97,7 @@ public class MainMenu
 
         if (list.Count == 0)
             {
-                AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
+                ConsoleHelper.ShowError("Det finns inga restauranger än.");
                 return;
             }
              //Skriver ut en tabell med alla resturanger
@@ -147,11 +147,11 @@ public class MainMenu
         try
             {
                 restaurants.Add(restaurant);
-                AnsiConsole.MarkupLine("[green]Restaurangen har lagts till.[/]");
+                ConsoleHelper.ShowSuccess("Restaurangen har lagts till.");
             }
             catch (ArgumentException ex)
             {
-                AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
+                ConsoleHelper.ShowError(ex.Message);
             }
     }
 
@@ -166,7 +166,7 @@ public class MainMenu
         // Om listan är tom finns det ingen restaurang att uppdatera
         if (list.Count == 0)
         {
-            AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
+            ConsoleHelper.ShowError("Det finns inga restauranger än.");
             return;
         }
 
@@ -178,7 +178,7 @@ public class MainMenu
         // Om inga matchningar hittas, visa ett meddelande och returnera
         if (matches.Count == 0)
         {
-            AnsiConsole.MarkupLine("[yellow]Inga restauranger hittades.[/]");
+            ConsoleHelper.ShowError($"Inga restauranger hittades för '{text}'.");
             return;
         }
 
@@ -238,9 +238,9 @@ public class MainMenu
         }
 
         if (restaurants.Update(selected))
-            AnsiConsole.MarkupLine("[green]Restaurang uppdaterad.[/]");
+            ConsoleHelper.ShowSuccess("Restaurang uppdaterad.");
         else
-            AnsiConsole.MarkupLine("[red]Misslyckades att uppdatera restaurang.[/]");
+            ConsoleHelper.ShowError("Misslyckades att uppdatera restaurang.");
     }
 
     // DeleteRestaurant(): void - tar bort restaurang efter bekräftelse
@@ -252,7 +252,7 @@ public class MainMenu
         // Om listan är tom finns det ingen restaurang att uppdatera
         if (list.Count == 0)
         {
-            AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
+            ConsoleHelper.ShowError("Det finns inga restauranger än.");
             return;
         }
 
@@ -264,7 +264,7 @@ public class MainMenu
         // Om inga matchningar hittas, visa ett meddelande och returnera
         if (matches.Count == 0)
         {
-            AnsiConsole.MarkupLine("[yellow]Inga restauranger hittades.[/]");
+            ConsoleHelper.ShowError($"Inga restauranger hittades för '{text}'.");
             return;
         }
 
@@ -281,11 +281,11 @@ public class MainMenu
         if (confirm)
         {
             restaurants.Delete(selected.Id);
-            AnsiConsole.MarkupLine("[green]Restaurang borttagen.[/]");
+            ConsoleHelper.ShowSuccess("Restaurang borttagen.");
         }
         else
         {
-            AnsiConsole.MarkupLine("[yellow]Borttagning avbruten.[/]");
+            ConsoleHelper.ShowError("Borttagning avbruten.");
         }
     }
 
@@ -297,7 +297,7 @@ public class MainMenu
         // Om listan är tom finns det inget att söka i
         if (restaurants.GetAll().Count == 0)
         {
-            AnsiConsole.MarkupLine("[yellow]Det finns inga restauranger än.[/]");
+            ConsoleHelper.ShowError("Det finns inga restauranger i listan.");
             return;
         }
 
@@ -308,11 +308,11 @@ public class MainMenu
 
         if (results.Count == 0)
         {
-            AnsiConsole.MarkupLine($"[yellow]Inga restauranger hittades för '{Markup.Escape(text)}'.[/]");
+            ConsoleHelper.ShowError($"Inga restauranger hittades för '{text}'.");
             return;
         }
 
-        AnsiConsole.MarkupLine($"[green]{results.Count} träff(ar) för '{Markup.Escape(text)}':[/]");
+        ConsoleHelper.ShowSuccess($"Hittade {results.Count} restaurang(er) för '{text}':");
         TableRenderer.ShowRestaurantTable(results);
     }
 

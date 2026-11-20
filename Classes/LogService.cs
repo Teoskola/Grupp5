@@ -53,7 +53,7 @@ public class LogService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Kunde inte spara loggen: " + ex.Message);
+            ConsoleHelper.ShowError($"Kunde inte spara log till JSON: {ex.Message}");
         }
     }
 }
