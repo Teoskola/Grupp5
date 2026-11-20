@@ -89,6 +89,11 @@ public class RestaurantService
     //     return store.OrderByDescending(restaurant => restaurant.Rating).ToList();
     // }
     // Load(): void - laddar JSON vid programstart, loggar
+    public void Load()
+    {
+        store.LoadFromJson();
+        log.LogEvent("Restauranger har laddats från JSON-fil");
+    }
     // Save(): void - sparar JSON vid programavslut, loggar
     public void Save()
     {

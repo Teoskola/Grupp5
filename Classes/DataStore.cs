@@ -48,4 +48,20 @@ public class DataStore<T> where T : IIdentifiable
     }
 
     // LoadFromJson(): void - läser fil, Deserialize; tom lista om filen saknas
+    public void loadFromJson()
+    {
+        try
+        {
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                items = JsonSerializer.Deserialize<List<T>>(json) ?? new List<T>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fel vid inläsning av JSON: {ex.Message}");
+            items = new List<T>();
+        }
+    }
 }

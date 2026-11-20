@@ -6,7 +6,7 @@ class Program
     {
         var restaurantService = new RestaurantService();
         // Ladda restauranger från JSON-fil (om filen finns)
-        //restaurantService.LoadFromJson();
+        restaurantService.Load();
 
         var mainMenu = new MainMenu(restaurantService);
         mainMenu.Run();
