@@ -20,17 +20,6 @@ public class StatisticsService
             .ToDictionary(grupp => grupp.Key, grupp => grupp.Count());
     }
 
-    // AverageRating(): double - snittbetyg (0 om listan är tom)
-    public double AverageRating()
-    {
-        var list = restaurants.GetAll();
-
-        if (list.Count == 0)
-            return 0;
-
-        return list.Average(avg => avg.Rating);
-    }
-
     // GetTopRated(n): List<Restaurant> - topplista: den högst betygsatta
     public List<Restaurant> GetTopRated(int number)
     {

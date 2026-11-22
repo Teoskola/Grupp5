@@ -39,7 +39,7 @@ public static class TableRenderer
 
         if (counts.Count == 0)
         {
-            AnsiConsole.MarkupLine("[yellow]Det finns ingen statistik än.[/]");
+            ConsoleHelper.ShowError("Listan är tom, det finns ingen statistik att visa.");
             return;
         }
 
