@@ -79,25 +79,39 @@ public class RestaurantService
             .ToList();
     }
     // FilterByCuisine(c): List<Restaurant> - LINQ Where: bara valt kök
-    // public DataStore<Restaurant> FilterByCuisine(CuisineType cuisine)
-    // {
-    //     return store.Where(restaurant => restaurant.Cuisinetype == cuisine).ToList();
-    // }
-    // // SortByRating(): List<Restaurant> - LINQ OrderByDescending: högst betyg först
-    // public DataStore<Restaurant> SortByRating()
-    // {
-    //     return store.OrderByDescending(restaurant => restaurant.Rating).ToList();
-    // }
+    public List<Restaurant> FilterByCuisine(CuisineType cuisine)
+    {
+        return store.GetAll().Where(restaurant => restaurant.Cuisinetype == cuisine).ToList();
+    }
+
+    public List<Restaurant> SortByRating()
+    {
+        return store.GetAll().OrderByDescending(restaurant => restaurant.Rating).ToList();
+    }
     // Load(): void - laddar JSON vid programstart, loggar
     public void Load()
     {
-        store.LoadFromJson();
-        log.LogEvent("Restauranger har laddats från JSON-fil");
+        try
+        {
+            store.LoadFromJson();
+            log.LogEvent("Restauranger har laddats från JSON-fil");
+        }
+        catch (Exception ex)
+        {
+            log.LogError("Kunde inte ladda data", ex);
+        }
     }
     // Save(): void - sparar JSON vid programavslut, loggar
     public void Save()
     {
-        store.SaveToJson();
-        log.LogEvent("Data har sparats till JSON");
+        try
+        {
+            store.SaveToJson();
+            log.LogEvent("Data har sparats till JSON");
+        }
+        catch (Exception ex)
+        {
+            log.LogError("Kunde inte spara data", ex);
+        }
     }
 }

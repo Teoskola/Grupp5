@@ -28,19 +28,19 @@ public class LogService
     }
 
     // LogError(message): void - loggar ett fel med exception-text
-    // public void LogError(string message, Exception ex)
-    // {
-    //     var entry = new LogEntry
-    //     {
-    //         Timestamp = DateTime.Now,
-    //         // Nivån är "error" för fel
-    //         Level = "Error",
-    //         // Meddelandet är det som skickades in som parameter + exception-texten
-    //         Message = message + " - Exception: " + ex.Message
-    //     };
-    //     entries.Add(entry);
-    //     SaveLog(); // Spara loggen till filen varje gång en ny post läggs till
-    // }
+    public void LogError(string message, Exception ex)
+    {
+        var entry = new LogEntry
+        {
+            Timestamp = DateTime.Now,
+            // Nivån är "error" för fel
+            Level = "Error",
+            // Meddelandet är det som skickades in som parameter + exception-texten
+            Message = message + " - Exception: " + ex.Message
+        };
+        entries.Add(entry);
+        SaveLog(); // Spara loggen till filen varje gång en ny post läggs till
+    }
     
     // SaveLog(): void - skriver listan till log.json
     public void SaveLog()

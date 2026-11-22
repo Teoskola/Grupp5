@@ -44,6 +44,7 @@ public class DataStore<T> where T : IIdentifiable
         catch (Exception ex)
         {
             ConsoleHelper.ShowError($"Fel vid sparande till JSON: {ex.Message}");
+            throw;
         }
     }
 
@@ -62,6 +63,7 @@ public class DataStore<T> where T : IIdentifiable
         {
             ConsoleHelper.ShowError($"Fel vid inläsning av JSON: {ex.Message}");
             items = new List<T>();
+            throw;
         }
     }
 }
