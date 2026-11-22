@@ -36,32 +36,27 @@ public class DataStore<T> where T : IIdentifiable
     // SaveToJson(): void - Json.Serializer.Serialize till fil (try/catch)
     public void SaveToJson()
     {
-        try
-        {
-            var json = JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(filePath, json);
-        }
-        catch (Exception ex)
-        {
-            ConsoleHelper.ShowError($"Fel vid sparande till JSON: {ex.Message}");
-            throw;
-        }
+        var json = JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText(filePath, json);
     }
 
     // LoadFromJson(): void - läser fil, Deserialize; tom lista om filen saknas
-    public void LoadFromJson()
+    public bool LoadFromJson()
     {
+        if (!File.Exists(filePath))
+            return false;
+
         try
         {
-            if (File.Exists(filePath))
-            {
-                string json = File.ReadAllText(filePath);
-                items = JsonSerializer.Deserialize<List<T>>(json) ?? new List<T>();
-            }
+            string json = File.ReadAllText(filePath);
+            if (string.IsNullOrWhiteSpace(json))
+                return false;
+
+            items = JsonSerializer.Deserialize<List<T>>(json) ?? new List<T>();
+            return true;
         }
-        catch (Exception ex)
+        catch
         {
-            ConsoleHelper.ShowError($"Fel vid inläsning av JSON: {ex.Message}");
             items = new List<T>();
             throw;
         }

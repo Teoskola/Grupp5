@@ -89,29 +89,36 @@ public class RestaurantService
         return store.GetAll().OrderByDescending(restaurant => restaurant.Rating).ToList();
     }
     // Load(): void - laddar JSON vid programstart, loggar
-    public void Load()
+    public bool Load()
     {
         try
         {
-            store.LoadFromJson();
-            log.LogEvent("Restauranger har laddats från JSON-fil");
+            if (store.LoadFromJson())
+                log.LogEvent($"{store.GetAll().Count} restauranger har laddats från JSON-fil");
+            else
+                log.LogEvent("Ingen sparad data hittades, startar med tom lista");
+
+            return true;
         }
         catch (Exception ex)
         {
-            log.LogError("Kunde inte ladda data", ex);
+            log.LogError("Kunde inte ladda data, startar med tom lista", ex);
+            return false;
         }
     }
     // Save(): void - sparar JSON vid programavslut, loggar
-    public void Save()
+    public bool Save()
     {
         try
         {
             store.SaveToJson();
             log.LogEvent("Data har sparats till JSON");
+            return true;
         }
         catch (Exception ex)
         {
             log.LogError("Kunde inte spara data", ex);
+            return false;
         }
     }
 }
