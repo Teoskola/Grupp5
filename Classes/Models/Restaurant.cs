@@ -21,12 +21,6 @@ namespace Grupp5;
         // IsVegetarianFriendly: bool - true om restaurangen är vegetariskvänlig, annars false
         public bool IsVegetarianFriendly { get; set; }
 
-        //METODER
-        // GetSummary(): string - kort text för visning
-        public string GetSummary()
-        {
-            return $"{Name} - {Cuisinetype} - {District} - {Address} - Rating: {Rating} - Price Level: {PriceLevel} - Vegetarian Friendly: {IsVegetarianFriendly}";
-        }
-    
+       
     }
 

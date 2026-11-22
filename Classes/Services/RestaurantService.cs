@@ -78,16 +78,7 @@ public class RestaurantService
                 (restaurant.District?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false))
             .ToList();
     }
-    // FilterByCuisine(c): List<Restaurant> - LINQ Where: bara valt kök
-    public List<Restaurant> FilterByCuisine(CuisineType cuisine)
-    {
-        return store.GetAll().Where(restaurant => restaurant.Cuisinetype == cuisine).ToList();
-    }
-
-    public List<Restaurant> SortByRating()
-    {
-        return store.GetAll().OrderByDescending(restaurant => restaurant.Rating).ToList();
-    }
+   
     // Load(): void - laddar JSON vid programstart, loggar
     public bool Load()
     {
