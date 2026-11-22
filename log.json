@@ -1,11 +1,11 @@
 [
   {
-    "Timestamp": "2026-11-22T14:55:38.7832882+01:00",
+    "Timestamp": "2026-11-22T16:26:37.4352899+01:00",
     "Level": "Info",
     "Message": "Restauranger har laddats fr\u00E5n JSON-fil"
   },
   {
-    "Timestamp": "2026-11-22T14:58:05.4242048+01:00",
+    "Timestamp": "2026-11-22T16:26:39.7559874+01:00",
     "Level": "Info",
     "Message": "Data har sparats till JSON"
   }
