@@ -11,6 +11,21 @@ public class LogService
 
     //METODER
     // LogEvent(message): void - loggar en vanlig händelse
+    public LogService()
+    {
+        try
+        {
+            if (File.Exists(logFile))
+            {
+                string json = File.ReadAllText(logFile);
+                entries = JsonSerializer.Deserialize<List<LogEntry>>(json) ?? new List<LogEntry>();
+            }
+        }
+        catch (JsonException)
+        {
+            entries = new List<LogEntry>();   // trasig/tom fil -> börja om
+        }
+    }
     public void LogEvent(string message)
     {
         // Skapar en ny loggpost och lägger till den i listan
