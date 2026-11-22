@@ -4,7 +4,17 @@ using Spectre.Console;
 public class ConsoleHelper
 {
     //METODER
-    // ShowBanner(): void - animerad startskärm / banner
+    // ShowTitle(): void - rubrik som visas överst i menyn (ingen animation)
+    public static void ShowBanner()
+    {
+        AnsiConsole.Write(new Rule("[blue]Välkommen till[/]").RuleStyle("grey").Centered());
+        AnsiConsole.Write(new FigletText("Restaurangguiden").Centered().Color(Color.Blue));
+        AnsiConsole.Write(
+            new Panel(Align.Center(new Markup("[italic]Alla dina matställen, samlade på ett ställe[/]")))
+                .Border(BoxBorder.Rounded)
+                .BorderColor(Color.Grey));
+        AnsiConsole.WriteLine();
+    }
     // ShowSuccess(message): void - grön text
     public static void ShowSuccess(string message)
     {

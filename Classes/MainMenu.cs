@@ -43,13 +43,12 @@ public class MainMenu
         {
             // Rensa skärmen och rita rubriken med stora bokstäver
             AnsiConsole.Clear();
-            AnsiConsole.Write(new FigletText("Restaurangguiden").Color(Color.Green));
-
+            ConsoleHelper.ShowBanner();
             // Visar en lista som användaren väljer ur med piltangenterna (↑/↓) och Enter.
             // Det som returneras är texten på alternativet som valdes.
             string choice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-                    .Title("[green]Vad vill du göra?[/]")   // [green]...[/] = färgad text
+                    .Title("[white]Vad vill du göra?[/]")   // [green]...[/] = färgad text
                     .PageSize(10)                            // max antal rader som visas åt gången
                     .AddChoices(
                         "Visa alla restauranger",
