@@ -48,7 +48,7 @@ public class DataStore<T> where T : IIdentifiable
     }
 
     // LoadFromJson(): void - läser fil, Deserialize; tom lista om filen saknas
-    public void loadFromJson()
+    public void LoadFromJson()
     {
         try
         {
