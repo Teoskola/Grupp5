@@ -2,6 +2,7 @@
 namespace Grupp5;
 
 
+
 public enum CuisineType
 {
     None,                   // Ingen specifik typ av mat
