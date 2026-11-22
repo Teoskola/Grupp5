@@ -53,6 +53,7 @@ public class MainMenu
                     .PageSize(10)                            // max antal rader som visas åt gången
                     .AddChoices(
                         "Visa alla restauranger",
+                        "Visa statistik",
                         "Lägg till restaurang",
                         "Redigera restaurang",
                         "Ta bort restaurang",
@@ -65,6 +66,9 @@ public class MainMenu
             {
                 case "Visa alla restauranger":
                     ShowAllRestaurants();
+                    break;
+                case "Visa statistik":
+                    ShowStatistics();
                     break;
                 case "Lägg till restaurang":
                     AddRestaurant();
@@ -107,6 +111,19 @@ public class MainMenu
     // AddRestaurant(): void - frågar efter data, validerar, skapar Restaurant
     // Tips: fråga efter namn, adress, område, kök, prisnivå, betyg och vegetariskt,
     // skapa en Restaurant och anropa restaurants.Add(...) i en try/catch.
+    public void ShowStatistics()
+    {
+        var stats = new StatisticsService(restaurants);
+
+        if (stats.CountByCuisine().Count == 0)
+        {
+            AnsiConsole.MarkupLine("[yellow]Det finns ingen statistik än.[/]");
+            return;
+        }
+
+        TableRenderer.ShowStatistics(stats);
+    }
+    
     private void AddRestaurant()
     {
         string name = AnsiConsole.Ask<string>("Namn på restaurangen: ");
