@@ -113,13 +113,6 @@ public class MainMenu
     public void ShowStatistics()
     {
         var stats = new StatisticsService(restaurants);
-
-        if (stats.CountByCuisine().Count == 0)
-        {
-            AnsiConsole.MarkupLine("[yellow]Det finns ingen statistik än.[/]");
-            return;
-        }
-
         TableRenderer.ShowStatistics(stats);
     }
     
@@ -202,7 +195,7 @@ public class MainMenu
         var selected = AnsiConsole.Prompt(
             new SelectionPrompt<Restaurant>()
                 .Title("[green]Vilken restaurang vill du ändra?[/]")
-                .UseConverter(r => $"{r.Name} - {r.Address}")
+                .UseConverter(r => $"{Markup.Escape(r.Name ?? "")} - {Markup.Escape(r.Address ?? "")}")
                 .AddChoices(matches));
 
         // Fråga användaren vilket fält som ska uppdateras
@@ -288,7 +281,7 @@ public class MainMenu
         var selected = AnsiConsole.Prompt(
             new SelectionPrompt<Restaurant>()
                 .Title("[green]Välj restaurang att ta bort:[/]")
-                .UseConverter(r => $"{r.Name} - {r.Address}")
+                .UseConverter(r => $"{Markup.Escape(r.Name ?? "")} - {Markup.Escape(r.Address ?? "")}")
                 .AddChoices(matches));
 
         // Bekräfta borttagning
@@ -296,8 +289,10 @@ public class MainMenu
 
         if (confirm)
         {
-            restaurants.Delete(selected.Id);
+            if (restaurants.Delete(selected.Id))
             ConsoleHelper.ShowSuccess("Restaurang borttagen.");
+            else 
+            ConsoleHelper.ShowError("Misslyckades att ta bort restaurang");
         }
         else
         {
