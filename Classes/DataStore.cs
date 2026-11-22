@@ -43,12 +43,12 @@ public class DataStore<T> where T : IIdentifiable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error saving to JSON: {ex.Message}");
+            ConsoleHelper.ShowError($"Fel vid sparande till JSON: {ex.Message}");
         }
     }
 
     // LoadFromJson(): void - läser fil, Deserialize; tom lista om filen saknas
-    public void loadFromJson()
+    public void LoadFromJson()
     {
         try
         {
@@ -60,7 +60,7 @@ public class DataStore<T> where T : IIdentifiable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Fel vid inläsning av JSON: {ex.Message}");
+            ConsoleHelper.ShowError($"Fel vid inläsning av JSON: {ex.Message}");
             items = new List<T>();
         }
     }
