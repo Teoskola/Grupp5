@@ -1,0 +1,330 @@
+using Spectre.Console;
+
+namespace Grupp5;
+
+/// <summary>
+/// Huvudmenyn (UI-delen). Visar en meny med pilval, tar emot användarens val
+/// och anropar rätt metod. Menyn sköter bara frågor och utskrifter, medan
+/// själva logiken (spara, söka, ta bort) ligger i RestaurantService.
+/// </summary>
+public class MainMenu
+{
+    // ATTRIBUTER
+
+    // Referens till servicen som hanterar restaurangerna.
+    // "private" = bara MainMenu kan använda den.
+    // "readonly" = värdet sätts en gång (i konstruktorn) och kan inte bytas ut senare.
+    private readonly RestaurantService restaurants;
+
+    // KONSTRUKTOR
+
+    /// <summary>
+    /// Körs när man skriver "new MainMenu(service)" i Program.cs.
+    /// Menyn får ett RestaurantService-objekt utifrån och sparar det i fältet,
+    /// så att alla metoder i klassen kan använda det.
+    /// </summary>
+    /// <param name="restaurants">Servicen som menyn ska anropa.</param>
+    public MainMenu(RestaurantService restaurants)
+    {
+        // "this.restaurants" är fältet i klassen,
+        // "restaurants" är parametern som skickades in. Här kopplas de ihop.
+        this.restaurants = restaurants;
+    }
+
+    // METODER
+
+    /// <summary>
+    /// Huvudloopen. Visar menyn, läser användarens val, kör rätt metod
+    /// och börjar om, tills användaren väljer "Avsluta".
+    /// </summary>
+    public void Run()
+    {
+        while (true)   // upprepas tills "return" körs
+        {
+            // Rensa skärmen och rita rubriken med stora bokstäver
+            AnsiConsole.Clear();
+            ConsoleHelper.ShowBanner();
+            // Visar en lista som användaren väljer ur med piltangenterna (↑/↓) och Enter.
+            // Det som returneras är texten på alternativet som valdes.
+            string choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[white]Vad vill du göra?[/]")   // [green]...[/] = färgad text
+                    .PageSize(10)                            // max antal rader som visas åt gången
+                    .AddChoices(
+                        "Visa alla restauranger",
+                        "Visa statistik",
+                        "Lägg till restaurang",
+                        "Redigera restaurang",
+                        "Ta bort restaurang",
+                        "Sök restauranger",
+                        "Avsluta"));
+
+            // Skicka vidare till rätt metod beroende på valet.
+            // Texten i "case" måste vara exakt samma som i AddChoices ovan.
+            switch (choice)
+            {
+                case "Visa alla restauranger":
+                    ShowAllRestaurants();
+                    break;
+                case "Visa statistik":
+                    ShowStatistics();
+                    break;
+                case "Lägg till restaurang":
+                    AddRestaurant();
+                    break;
+                case "Redigera restaurang":
+                    EditRestaurant();
+                    break;
+                case "Ta bort restaurang":
+                    DeleteRestaurant();
+                    break;
+                case "Sök restauranger":
+                    SearchRestaurants();
+                    break;
+                case "Avsluta":
+                    return;   // lämnar Run() och därmed programmet
+            }
+
+            // Utan paus skulle skärmen rensas direkt i nästa varv,
+            // och användaren hinner inte läsa resultatet.
+            AnsiConsole.MarkupLine("\n[grey]Tryck på valfri tangent för att fortsätta...[/]");
+            Console.ReadKey(true);   // true = visa inte tangenten som skrivs
+        }
+    }
+
+    // ShowAllRestaurants(): void - visar alla restauranger
+    // Tips: hämta listan med restaurants.GetAll() och skriv ut en rad per restaurang.
+    private void ShowAllRestaurants()
+    {
+        var list = restaurants.GetAll();
+
+        if (list.Count == 0)
+            {
+                ConsoleHelper.ShowError("Det finns inga restauranger än.");
+                return;
+            }
+             //Skriver ut en tabell med alla resturanger
+            TableRenderer.ShowRestaurantTable(list);
+        }
+
+    // AddRestaurant(): void - frågar efter data, validerar, skapar Restaurant
+    // Tips: fråga efter namn, adress, område, kök, prisnivå, betyg och vegetariskt,
+    // skapa en Restaurant och anropa restaurants.Add(...) i en try/catch.
+    public void ShowStatistics()
+    {
+        var stats = new StatisticsService(restaurants);
+        TableRenderer.ShowStatistics(stats);
+    }
+    
+    private void AddRestaurant()
+    {
+        string name = AnsiConsole.Ask<string>("Namn på restaurangen: ");
+
+        string district = AnsiConsole.Ask<string>("Område: ");
+
+        string adress = AnsiConsole.Ask<string>("Adress: ");
+        
+        double rating = AnsiConsole.Prompt(
+            new TextPrompt<double>("Betyg (1-5): ")
+                .Validate(ratingInput => ratingInput >= 1 && ratingInput <= 5
+                    ? ValidationResult.Success()
+                    : ValidationResult.Error("[red]Betyget måste vara mellan 1 och 5[/]")));
+
+        PriceLevel priceLevel = AnsiConsole.Prompt(
+            new SelectionPrompt<PriceLevel>()
+                .Title("[green]Hur dyrt är det?[/]")
+                .AddChoices(Enum.GetValues<PriceLevel>()));
+
+        CuisineType cuisineType = AnsiConsole.Prompt(
+            new SelectionPrompt<CuisineType>()
+                .Title("[green]Vilket kök serveras?[/]")
+                .AddChoices(Enum.GetValues<CuisineType>()));    
+
+        bool isVegetarian = AnsiConsole.Confirm("Finns vegetariska alternativ?");
+
+        var restaurant = new Restaurant
+            {
+                Name = name,
+                District = district,
+                Address = adress,
+                Rating = rating,
+                PriceLevel = priceLevel,
+                Cuisinetype = cuisineType,
+                IsVegetarianFriendly = isVegetarian
+            };
+
+        try
+            {
+                restaurants.Add(restaurant);
+                ConsoleHelper.ShowSuccess("Restaurangen har lagts till.");
+            }
+            catch (ArgumentException ex)
+            {
+                ConsoleHelper.ShowError(ex.Message);
+            }
+    }
+
+
+    // EditRestaurant(): void - väljer restaurang och ändrar fält
+    // Tips: fråga efter Id, hitta restaurangen, fråga efter nya värden
+    // och anropa restaurants.Update(...).
+    private void EditRestaurant()
+    {
+        var list = restaurants.GetAll();
+        
+        // Om listan är tom finns det ingen restaurang att uppdatera
+        if (list.Count == 0)
+        {
+            ConsoleHelper.ShowError("Det finns inga restauranger än.");
+            return;
+        }
+
+        //Fråga användaren efter söktext för att hitta restaurangen som ska uppdateras
+        string text = AnsiConsole.Ask<string>("Vilken restaurang vill du uppdatera? Sök: ");
+        
+        var matches = restaurants.Search(text);
+
+        // Om inga matchningar hittas, visa ett meddelande och returnera
+        if (matches.Count == 0)
+        {
+            ConsoleHelper.ShowError($"Inga restauranger hittades för '{text}'.");
+            return;
+        }
+
+        // Låt användaren välja en restaurang från matchningarna
+        var selected = AnsiConsole.Prompt(
+            new SelectionPrompt<Restaurant>()
+                .Title("[green]Vilken restaurang vill du ändra?[/]")
+                .UseConverter(r => $"{Markup.Escape(r.Name ?? "")} - {Markup.Escape(r.Address ?? "")}")
+                .AddChoices(matches));
+
+        // Fråga användaren vilket fält som ska uppdateras
+        string choice = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Vad vill du uppdatera?")
+                .AddChoices("Namn", "Område", "Adress", "Betyg", "Prisnivå", "Kök", "Vegetariskt"));
+
+        switch (choice)
+        {
+            case "Namn":
+                string newName = AnsiConsole.Ask<string>("Nytt namn: ");
+                selected.Name = newName;
+                break;
+            case "Område":
+                string newDistrict = AnsiConsole.Ask<string>("Nytt område: ");
+                selected.District = newDistrict;
+                break;
+            case "Adress":
+                string newAddress = AnsiConsole.Ask<string>("Ny adress: ");
+                selected.Address = newAddress;
+                break;
+            case "Betyg":
+                double newRating = AnsiConsole.Prompt(
+                    new TextPrompt<double>("Nytt betyg (1-5): ")
+                        .Validate(ratingInput => ratingInput >= 1 && ratingInput <= 5
+                            ? ValidationResult.Success()
+                            : ValidationResult.Error("[red]Betyget måste vara mellan 1 och 5[/]")));
+                selected.Rating = newRating;
+                break;
+            case "Prisnivå":
+                PriceLevel newPriceLevel = AnsiConsole.Prompt(
+                    new SelectionPrompt<PriceLevel>()
+                        .Title("[green]Hur dyrt är det?[/]")
+                        .AddChoices(Enum.GetValues<PriceLevel>()));
+                    selected.PriceLevel = newPriceLevel;
+                break;
+            case "Kök":
+                CuisineType newCuisineType = AnsiConsole.Prompt(
+                    new SelectionPrompt<CuisineType>()
+                        .Title("[green]Vilket kök serveras?[/]")
+                        .AddChoices(Enum.GetValues<CuisineType>()));
+                    selected.Cuisinetype = newCuisineType;
+                break;
+            case "Vegetariskt":
+                bool newIsVegetarian = AnsiConsole.Confirm("Finns vegetariska alternativ?");
+                selected.IsVegetarianFriendly = newIsVegetarian;
+                break;
+        }
+
+        if (restaurants.Update(selected))
+            ConsoleHelper.ShowSuccess("Restaurang uppdaterad.");
+        else
+            ConsoleHelper.ShowError("Misslyckades att uppdatera restaurang.");
+    }
+
+    // DeleteRestaurant(): void - tar bort restaurang efter bekräftelse
+    // Tips: fråga efter Id, be om bekräftelse och anropa restaurants.Delete(id).
+    private void DeleteRestaurant()
+    {
+        var list = restaurants.GetAll();
+        
+        // Om listan är tom finns det ingen restaurang att uppdatera
+        if (list.Count == 0)
+        {
+            ConsoleHelper.ShowError("Det finns inga restauranger än.");
+            return;
+        }
+
+        //Fråga användaren efter söktext för att hitta restaurangen som ska uppdateras
+        string text = AnsiConsole.Ask<string>("Vilken restaurang vill du ta bort? Sök: ");
+        
+        var matches = restaurants.Search(text);
+
+        // Om inga matchningar hittas, visa ett meddelande och returnera
+        if (matches.Count == 0)
+        {
+            ConsoleHelper.ShowError($"Inga restauranger hittades för '{text}'.");
+            return;
+        }
+
+        // Låt användaren välja en restaurang från matchningarna
+        var selected = AnsiConsole.Prompt(
+            new SelectionPrompt<Restaurant>()
+                .Title("[green]Välj restaurang att ta bort:[/]")
+                .UseConverter(r => $"{Markup.Escape(r.Name ?? "")} - {Markup.Escape(r.Address ?? "")}")
+                .AddChoices(matches));
+
+        // Bekräfta borttagning
+        bool confirm = AnsiConsole.Confirm($"Är du säker på att du vill ta bort {selected.Name}?");
+
+        if (confirm)
+        {
+            if (restaurants.Delete(selected.Id))
+            ConsoleHelper.ShowSuccess("Restaurang borttagen.");
+            else 
+            ConsoleHelper.ShowError("Misslyckades att ta bort restaurang");
+        }
+        else
+        {
+            ConsoleHelper.ShowError("Borttagning avbruten.");
+        }
+    }
+
+    // SearchRestaurants(): void - frågar efter söktext och visar resultat
+    // Tips: fråga efter text, anropa restaurants.Search(text) och skriv ut träffarna.
+    private void SearchRestaurants()
+    {
+        // SearchRestaurants(): void - frågar efter söktext och visar resultat
+        // Om listan är tom finns det inget att söka i
+        if (restaurants.GetAll().Count == 0)
+        {
+            ConsoleHelper.ShowError("Det finns inga restauranger i listan.");
+            return;
+        }
+
+        string text = AnsiConsole.Ask<string>("Sök (namn, adress eller område): ");
+
+        // Själva sökningen görs i servicen (LINQ), menyn visar bara resultatet
+        var results = restaurants.Search(text);
+
+        if (results.Count == 0)
+        {
+            ConsoleHelper.ShowError($"Inga restauranger hittades för '{text}'.");
+            return;
+        }
+
+        ConsoleHelper.ShowSuccess($"Hittade {results.Count} restaurang(er) för '{text}':");
+        TableRenderer.ShowRestaurantTable(results);
+    }
+
+}
